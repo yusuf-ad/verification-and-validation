@@ -185,4 +185,107 @@ describe("Create New Account Form", () => {
     );
     expect(dobErr2).toBeInTheDocument();
   });
+
+  // New failing tests
+  test("does not submit when confirm password is empty", async () => {
+    render(<App />);
+    fireEvent.change(screen.getByLabelText(/First Name/i), {
+      target: { value: "John" },
+    });
+    fireEvent.change(screen.getByLabelText(/Last Name/i), {
+      target: { value: "Doe" },
+    });
+    fireEvent.change(screen.getByLabelText(/E-mail/i), {
+      target: { value: "john@example.com" },
+    });
+    fireEvent.change(screen.getByLabelText(/^Password$/i), {
+      target: { value: "password123" },
+    });
+    // confirmPassword left empty
+    fireEvent.change(screen.getByLabelText(/Date of Birth/i), {
+      target: { value: "01/01/2000" },
+    });
+    fireEvent.click(screen.getByRole("button", { name: /submit/i }));
+
+    expect(console.log).not.toHaveBeenCalled();
+    const confirmErr = await screen.findByText(/Passwords do not match/i);
+    expect(confirmErr).toBeInTheDocument();
+  });
+
+  test("does not submit when email is empty", async () => {
+    render(<App />);
+    fireEvent.change(screen.getByLabelText(/First Name/i), {
+      target: { value: "Jane" },
+    });
+    fireEvent.change(screen.getByLabelText(/Last Name/i), {
+      target: { value: "Doe" },
+    });
+    // email left empty
+    fireEvent.change(screen.getByLabelText(/^Password$/i), {
+      target: { value: "password123" },
+    });
+    fireEvent.change(screen.getByLabelText(/Confirm Password/i), {
+      target: { value: "password123" },
+    });
+    fireEvent.change(screen.getByLabelText(/Date of Birth/i), {
+      target: { value: "01/01/2000" },
+    });
+    fireEvent.click(screen.getByRole("button", { name: /submit/i }));
+
+    expect(console.log).not.toHaveBeenCalled();
+    const emailErr = await screen.findByText(/Invalid email format/i);
+    expect(emailErr).toBeInTheDocument();
+  });
+
+  test("does not submit when last name is empty", async () => {
+    render(<App />);
+    fireEvent.change(screen.getByLabelText(/First Name/i), {
+      target: { value: "Alice" },
+    });
+    // lastName left empty
+    fireEvent.change(screen.getByLabelText(/E-mail/i), {
+      target: { value: "alice@example.com" },
+    });
+    fireEvent.change(screen.getByLabelText(/^Password$/i), {
+      target: { value: "password123" },
+    });
+    fireEvent.change(screen.getByLabelText(/Confirm Password/i), {
+      target: { value: "password123" },
+    });
+    fireEvent.change(screen.getByLabelText(/Date of Birth/i), {
+      target: { value: "31/12/1999" },
+    });
+    fireEvent.click(screen.getByRole("button", { name: /submit/i }));
+
+    expect(console.log).not.toHaveBeenCalled();
+    const lastErr = await screen.findByText(/Last Name is required/i);
+    expect(lastErr).toBeInTheDocument();
+  });
+
+  test("does not submit when date of birth is empty", async () => {
+    render(<App />);
+    fireEvent.change(screen.getByLabelText(/First Name/i), {
+      target: { value: "Test" },
+    });
+    fireEvent.change(screen.getByLabelText(/Last Name/i), {
+      target: { value: "User" },
+    });
+    fireEvent.change(screen.getByLabelText(/E-mail/i), {
+      target: { value: "test@user.com" },
+    });
+    fireEvent.change(screen.getByLabelText(/^Password$/i), {
+      target: { value: "password123" },
+    });
+    fireEvent.change(screen.getByLabelText(/Confirm Password/i), {
+      target: { value: "password123" },
+    });
+    // dob left empty
+    fireEvent.click(screen.getByRole("button", { name: /submit/i }));
+
+    expect(console.log).not.toHaveBeenCalled();
+    const dobErr = await screen.findByText(
+      /Date of Birth must be in dd\/mm\/yyyy format/i
+    );
+    expect(dobErr).toBeInTheDocument();
+  });
 });

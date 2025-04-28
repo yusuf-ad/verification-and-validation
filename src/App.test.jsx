@@ -4,7 +4,7 @@ import App from "./App";
 import { describe, test, expect, beforeEach, afterEach, vi } from "vitest";
 import "@testing-library/jest-dom";
 
-describe("Create New Account Form", () => {
+describe("Section 1: Basic Form Functionality", () => {
   beforeEach(() => {
     vi.spyOn(console, "log").mockImplementation(() => {});
   });
@@ -118,6 +118,16 @@ describe("Create New Account Form", () => {
     const emailErr = await screen.findByText(/Invalid email format/i);
     expect(emailErr).toBeInTheDocument();
   });
+});
+
+describe("Section 2: Validation and Error Handling", () => {
+  beforeEach(() => {
+    vi.spyOn(console, "log").mockImplementation(() => {});
+  });
+
+  afterEach(() => {
+    console.log.mockRestore();
+  });
 
   test("password length boundary: too short (<8) and exact boundary (8)", async () => {
     render(<App />);
@@ -186,7 +196,6 @@ describe("Create New Account Form", () => {
     expect(dobErr2).toBeInTheDocument();
   });
 
-  // New failing tests
   test("does not submit when confirm password is empty", async () => {
     render(<App />);
     fireEvent.change(screen.getByLabelText(/First Name/i), {
@@ -261,6 +270,16 @@ describe("Create New Account Form", () => {
     const lastErr = await screen.findByText(/Last Name is required/i);
     expect(lastErr).toBeInTheDocument();
   });
+});
+
+describe("Section 3: Additional Field Validations", () => {
+  beforeEach(() => {
+    vi.spyOn(console, "log").mockImplementation(() => {});
+  });
+
+  afterEach(() => {
+    console.log.mockRestore();
+  });
 
   test("does not submit when date of birth is empty", async () => {
     render(<App />);
@@ -287,5 +306,113 @@ describe("Create New Account Form", () => {
       /Date of Birth must be in dd\/mm\/yyyy format/i
     );
     expect(dobErr).toBeInTheDocument();
+  });
+  test("does not submit when first name is empty", async () => {
+    render(<App />);
+    // first name empty
+    fireEvent.change(screen.getByLabelText(/Last Name/i), {
+      target: { value: "User" },
+    });
+    fireEvent.change(screen.getByLabelText(/E-mail/i), {
+      target: { value: "test@user.com" },
+    });
+    fireEvent.change(screen.getByLabelText(/^Password$/i), {
+      target: { value: "password123" },
+    });
+    fireEvent.change(screen.getByLabelText(/Confirm Password/i), {
+      target: { value: "password123" },
+    });
+    fireEvent.change(screen.getByLabelText(/Date of Birth/i), {
+      target: { value: "01/01/2000" },
+    });
+    fireEvent.click(screen.getByRole("button", { name: /submit/i }));
+    expect(console.log).not.toHaveBeenCalled();
+    const err = await screen.findByText(/First Name is required/i);
+    expect(err).toBeInTheDocument();
+  });
+  test("boundary DOB date (29/02 on non-leap vs leap year)", async () => {
+    render(<App />);
+    // fill required valid fields
+    fireEvent.change(screen.getByLabelText(/First Name/i), {
+      target: { value: "Test" },
+    });
+    fireEvent.change(screen.getByLabelText(/Last Name/i), {
+      target: { value: "User" },
+    });
+    fireEvent.change(screen.getByLabelText(/E-mail/i), {
+      target: { value: "test@user.com" },
+    });
+    fireEvent.change(screen.getByLabelText(/^Password$/i), {
+      target: { value: "password123" },
+    });
+    fireEvent.change(screen.getByLabelText(/Confirm Password/i), {
+      target: { value: "password123" },
+    });
+
+    // non-leap year 29/02 should be rejected
+    fireEvent.change(screen.getByLabelText(/Date of Birth/i), {
+      target: { value: "29/02/2021" },
+    });
+    fireEvent.click(screen.getByRole("button", { name: /submit/i }));
+    expect(console.log).not.toHaveBeenCalled();
+    const nonLeapErr = await screen.findByText(
+      /Date of Birth must be in dd\/mm\/yyyy format/i
+    );
+    expect(nonLeapErr).toBeInTheDocument();
+
+    // leap year 29/02 should be accepted
+    fireEvent.change(screen.getByLabelText(/Date of Birth/i), {
+      target: { value: "29/02/2024" },
+    });
+    fireEvent.click(screen.getByRole("button", { name: /submit/i }));
+    expect(console.log).toHaveBeenCalled();
+  });
+  test("accepts invalid characters in name fields", async () => {
+    render(<App />);
+    // invalid chars in names
+    fireEvent.change(screen.getByLabelText(/First Name/i), {
+      target: { value: "J@hn$%" },
+    });
+    fireEvent.change(screen.getByLabelText(/Last Name/i), {
+      target: { value: "%Doe!" },
+    });
+    fireEvent.change(screen.getByLabelText(/E-mail/i), {
+      target: { value: "john@example.com" },
+    });
+    fireEvent.change(screen.getByLabelText(/^Password$/i), {
+      target: { value: "password123" },
+    });
+    fireEvent.change(screen.getByLabelText(/Confirm Password/i), {
+      target: { value: "password123" },
+    });
+    fireEvent.change(screen.getByLabelText(/Date of Birth/i), {
+      target: { value: "01/01/2000" },
+    });
+    fireEvent.click(screen.getByRole("button", { name: /submit/i }));
+    expect(console.log).toHaveBeenCalled();
+  });
+  test("accepts very long input values", async () => {
+    render(<App />);
+    const longStr = "a".repeat(500);
+    fireEvent.change(screen.getByLabelText(/First Name/i), {
+      target: { value: longStr },
+    });
+    fireEvent.change(screen.getByLabelText(/Last Name/i), {
+      target: { value: longStr },
+    });
+    fireEvent.change(screen.getByLabelText(/E-mail/i), {
+      target: { value: `${longStr}@example.com` },
+    });
+    fireEvent.change(screen.getByLabelText(/^Password$/i), {
+      target: { value: "a".repeat(8) },
+    });
+    fireEvent.change(screen.getByLabelText(/Confirm Password/i), {
+      target: { value: "a".repeat(8) },
+    });
+    fireEvent.change(screen.getByLabelText(/Date of Birth/i), {
+      target: { value: "10/10/2010" },
+    });
+    fireEvent.click(screen.getByRole("button", { name: /submit/i }));
+    expect(console.log).toHaveBeenCalled();
   });
 });

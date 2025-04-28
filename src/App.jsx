@@ -25,6 +25,17 @@ function App() {
     const dobPattern = /^(\d{2})\/(\d{2})\/(\d{4})$/;
     if (!dobPattern.test(dob)) {
       newErrors.dob = "Date of Birth must be in dd/mm/yyyy format";
+    } else {
+      // Verify actual date (including leap years)
+      const [day, month, year] = dob.split("/").map(Number);
+      const dateObj = new Date(year, month - 1, day);
+      if (
+        dateObj.getFullYear() !== year ||
+        dateObj.getMonth() + 1 !== month ||
+        dateObj.getDate() !== day
+      ) {
+        newErrors.dob = "Date of Birth must be in dd/mm/yyyy format";
+      }
     }
     if (Object.keys(newErrors).length) {
       setErrors(newErrors);

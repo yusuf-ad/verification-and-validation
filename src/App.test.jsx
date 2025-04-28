@@ -130,7 +130,7 @@ describe("Section 2: Validation and Error Handling", () => {
   });
 
   test("password length boundary: too short (<8) and exact boundary (8)", async () => {
-    render(<App />);
+    const { rerender } = render(<App />);
     // Test too short password
     fireEvent.change(screen.getByLabelText(/^Password$/i), {
       target: { value: "short1" },
@@ -145,7 +145,9 @@ describe("Section 2: Validation and Error Handling", () => {
     );
     expect(pwErr).toBeInTheDocument();
 
-    // Clear and test exact boundary password length
+    // Reset form and test exact boundary password length
+    rerender(<App />);
+    console.log.mockClear();
     fireEvent.change(screen.getByLabelText(/^Password$/i), {
       target: { value: "12345678" },
     });

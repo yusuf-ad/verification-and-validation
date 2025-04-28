@@ -9,16 +9,35 @@ function App() {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [dob, setDob] = useState("");
+  const [errors, setErrors] = useState({});
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    const newErrors = {};
+    if (!firstName.trim()) newErrors.firstName = "First Name is required";
+    if (!lastName.trim()) newErrors.lastName = "Last Name is required";
+    const emailPattern = /\S+@\S+\.\S+/;
+    if (!emailPattern.test(email)) newErrors.email = "Invalid email format";
+    if (password.length < 8)
+      newErrors.password = "Password must be at least 8 characters";
+    if (confirmPassword !== password)
+      newErrors.confirmPassword = "Passwords do not match";
+    const dobPattern = /^(\d{2})\/(\d{2})\/(\d{4})$/;
+    if (!dobPattern.test(dob)) {
+      newErrors.dob = "Date of Birth must be in dd/mm/yyyy format";
+    }
+    if (Object.keys(newErrors).length) {
+      setErrors(newErrors);
+      return;
+    }
+    setErrors({});
     console.log({ firstName, lastName, email, password, confirmPassword, dob });
   };
 
   return (
     <div className="container">
       <h1>Create New Account</h1>
-      <form onSubmit={handleSubmit} className="account-form">
+      <form noValidate onSubmit={handleSubmit} className="account-form">
         <div className="form-group">
           <label htmlFor="firstName">First Name</label>
           <input
@@ -26,8 +45,10 @@ function App() {
             type="text"
             value={firstName}
             onChange={(e) => setFirstName(e.target.value)}
-            required
           />
+          {errors.firstName && (
+            <span className="error">{errors.firstName}</span>
+          )}
         </div>
         <div className="form-group">
           <label htmlFor="lastName">Last Name</label>
@@ -36,8 +57,8 @@ function App() {
             type="text"
             value={lastName}
             onChange={(e) => setLastName(e.target.value)}
-            required
           />
+          {errors.lastName && <span className="error">{errors.lastName}</span>}
         </div>
         <div className="form-group">
           <label htmlFor="email">E-mail</label>
@@ -46,8 +67,8 @@ function App() {
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            required
           />
+          {errors.email && <span className="error">{errors.email}</span>}
         </div>
         <div className="form-group">
           <label htmlFor="password">Password</label>
@@ -56,8 +77,8 @@ function App() {
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            required
           />
+          {errors.password && <span className="error">{errors.password}</span>}
         </div>
         <div className="form-group">
           <label htmlFor="confirmPassword">Confirm Password</label>
@@ -66,8 +87,10 @@ function App() {
             type="password"
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
-            required
           />
+          {errors.confirmPassword && (
+            <span className="error">{errors.confirmPassword}</span>
+          )}
         </div>
         <div className="form-group">
           <label htmlFor="dob">Date of Birth (dd/mm/yyyy)</label>
@@ -77,8 +100,8 @@ function App() {
             placeholder="dd/mm/yyyy"
             value={dob}
             onChange={(e) => setDob(e.target.value)}
-            required
           />
+          {errors.dob && <span className="error">{errors.dob}</span>}
         </div>
         <button type="submit">SUBMIT</button>
       </form>

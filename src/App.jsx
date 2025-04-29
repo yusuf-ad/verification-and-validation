@@ -104,7 +104,7 @@ function App() {
           )}
         </div>
         <div className="form-group">
-          <label htmlFor="dob">Date of Birth (dd/mm/yyyy)</label>
+          <label htmlFor="dob">Date of Birth(dd/mm/yyyy)</label>
           <input
             id="dob"
             type="text"

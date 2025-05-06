@@ -26,7 +26,7 @@ function App() {
     if (!dobPattern.test(dob)) {
       newErrors.dob = "Date of Birth must be in dd/mm/yyyy format";
     } else {
-      // Verify actual date (including leap years)
+      // Verify actual date (including leap years
       const [day, month, year] = dob.split("/").map(Number);
       const dateObj = new Date(year, month - 1, day);
       if (

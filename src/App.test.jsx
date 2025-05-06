@@ -381,13 +381,13 @@ describe("Section 3: Additional Field Validations", () => {
     expect(nonLeapErr).toBeInTheDocument();
 
     // leap year 29/02 should be accepted
-    fireEvent.change(screen.getByLabelText(/Date of Birth/i), {
+    fireEvent.change(screen.getByLabelText(/Date of Birth./i), {
       target: { value: "29/02/2024" },
     });
     fireEvent.click(screen.getByRole("button", { name: /submit/i }));
     expect(console.log).toHaveBeenCalled();
   });
-  test("accepts invalid characters in name fields", async () => {
+  test("accepts invalid characters in name fields.", async () => {
     render(<App />);
     // invalid chars in names
     fireEvent.change(screen.getByLabelText(/First Name/i), {

@@ -42,6 +42,9 @@ function App() {
       return;
     }
     setErrors({});
+
+    alert("Form submitted successfully!");
+
     console.log({ firstName, lastName, email, password, confirmPassword, dob });
   };
 
